@@ -41,6 +41,9 @@ public class guessingGame : MonoBehaviour
         upperBound = int.Parse(upperBoundInput.text);
         randomNum = Random.Range(1, upperBound + 1);
         gameText.text = "Okay! The number is between 1 and " + upperBoundInput.text + ". Now take a guess!";
+        // gameText.text = $"Okay! The number is between 1 and {upperBoundInput.text}. Now take a guess!";
+
+        Debug.Log(randomNum);
     }
 
     void GuessNumber()
@@ -60,6 +63,8 @@ public class guessingGame : MonoBehaviour
             guessInput.gameObject.SetActive(false);
             guessButton.gameObject.SetActive(false);
         }
+
+        guessInput.text = "";
     }
 
 }
