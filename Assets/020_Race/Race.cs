@@ -21,6 +21,8 @@ public class Race : MonoBehaviour
     private int currentTurn1, currentTurn2;
     private Vector3 playerPos1 = new Vector3(-20, 0, -1);
     private Vector3 playerPos2 = new Vector3(-20, 5, -1);
+    private Vector3 updatePlayerPos1;
+    private Vector3 updatePlayerPos2;
 
     // Start is called before the first frame update
     void Start()
@@ -106,9 +108,17 @@ public class Race : MonoBehaviour
 
     private IEnumerator RaceGame()
     {
+        yield return new WaitForSeconds(turnDuration);
+
+        Vector3 updatePlayerPos1 = new Vector3(playerPos1.x + 5, playerPos1.y, playerPos1.z);
+        Vector3 updatePlayerPos2 = new Vector3(playerPos2.x + 5, playerPos2.y, playerPos2.z);
+        player1.transform.position = updatePlayerPos1;
+        player2.transform.position = updatePlayerPos2;
+
+        yield return new WaitForSeconds(turnDuration);
+
         currentTurn1 = 0;
         currentTurn2 = 0;
-
 
         while (!gameOver)
         {
@@ -158,8 +168,6 @@ public class Race : MonoBehaviour
     {
         float random1 = Random.Range(0f, 1f);
         float random2 = Random.Range(0f, 1f);
-        Vector3 updatePlayerPos1 = new Vector3(playerPos1.x + 5, playerPos1.y, playerPos1.z);
-        Vector3 updatePlayerPos2 = new Vector3(playerPos2.x + 5, playerPos2.y, playerPos2.z);
 
         if (random1 <= chanceToMoveList[currentTurn1])
         {
