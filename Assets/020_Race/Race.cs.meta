@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 7c9c5092e99ace341a4adacaed4adc86
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - player1: {fileID: 5622392069131868850, guid: 0bccf87e1860fee4fb234a60c07b72e7, type: 3}
+  - player2: {fileID: 5622392069131868850, guid: bdd6617978d2db946a48a45eda63606a, type: 3}
+  - GrassTerrain: {fileID: 2196150359741548735, guid: e9f1847b2adbc0d43a18a94b5858a124, type: 3}
+  - MudTerrain: {fileID: 445950770437108825, guid: 72ee0cb7313d72c4786dd67e4e523641, type: 3}
+  - player1Button: {instanceID: 0}
+  - player2Button: {instanceID: 0}
+  - startGameButton: {instanceID: 0}
+  - newMapButton: {instanceID: 0}
+  - resultText: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
