@@ -21,7 +21,8 @@ public class GenerateCards : MonoBehaviour
     private Vector3 deckCardPos = new Vector3(-0.7f, 0.9f, -0.15f);
     private Vector3 playerCardPos = new Vector3(-0.2f, 0.93f, -0.35f);
     private Vector3 dealerCardPos = new Vector3(-0.2f, 0.93f, -0.05f);
-    private Vector3 rotateCard = new Vector3(90, 0, 0);
+    private Vector3 faceDownRot = new Vector3(90, 0, 0);
+    private Vector3 faceUpRot = new Vector3(-90, 0, 0);
     private Vector3 scaleCard = new Vector3(1.5f, 1.5f, 1.5f);
     private double cardHeight = 0.0015;
     private GameObject dealerFirstCard;
@@ -136,7 +137,7 @@ public class GenerateCards : MonoBehaviour
         for (int i = 0; i < allCards.Count; i++)
         {
             Vector3 newDeckCardPos = new Vector3(deckCardPos.x, (float)(deckCardPos.y + i * cardHeight), deckCardPos.z);
-            GameObject newCardObj = Instantiate(allCards[i].card, newDeckCardPos, Quaternion.Euler(rotateCard));
+            GameObject newCardObj = Instantiate(allCards[i].card, newDeckCardPos, Quaternion.Euler(faceDownRot));
             newCardObj.transform.localScale = scaleCard;
             
         }
@@ -167,7 +168,6 @@ public class GenerateCards : MonoBehaviour
             GameObject newplayerCardObj = Instantiate(playerCard.card, playerHand);
             newplayerCardObj.transform.position = new Vector3(playerCardPos.x + i * 0.1f, playerCardPos.y, playerCardPos.z);
             newplayerCardObj.transform.localScale = scaleCard;
-            CalculateScore(playerCards);
 
             // Deal card to dealer
             Card dealerCard = DealCard();
@@ -175,12 +175,14 @@ public class GenerateCards : MonoBehaviour
             GameObject newdealerCardObj = Instantiate(dealerCard.card, dealerHand);
             newdealerCardObj.transform.position = new Vector3(dealerCardPos.x + i * 0.1f, dealerCardPos.y, dealerCardPos.z);
             newdealerCardObj.transform.localScale = scaleCard;
-            CalculateScore(dealerCards);
 
             if (i == 0)
             {
-                newdealerCardObj.transform.rotation = Quaternion.Euler(rotateCard);
+                newdealerCardObj.transform.rotation = Quaternion.Euler(faceDownRot);
             }
+
+            CheckForBust();
+            CheckForBlackjack();
         }
 
         PlayerTurn();
@@ -199,17 +201,8 @@ public class GenerateCards : MonoBehaviour
         newplayerCardObj.transform.position = new Vector3(playerCardPos.x + (playerCards.Count - 1) * 0.1f, playerCardPos.y, playerCardPos.z);
         newplayerCardObj.transform.localScale = scaleCard;
 
-        // Calculate player's score
-        int score = CalculateScore(playerCards);
-
-        // Check if player busts
-        if (score > 21)
-        {
-            Debug.Log("Player busts with a score of " + score);
-            EndRound();
-        }
-
-        DealerTurn();
+        CheckForBust();
+        CheckForBlackjack();
     }
 
     void Stand()
@@ -222,23 +215,6 @@ public class GenerateCards : MonoBehaviour
         playerTurn = true;
         hitBtn.gameObject.SetActive(true);
         standBtn.gameObject.SetActive(true);
-
-        
-        int playerScore = CalculateScore(playerCards);
-        int dealerScore = CalculateScore(dealerCards);
-
-        // Check if dealer busts
-        if (playerScore > 21)
-        {
-            Debug.Log("Player busts with a score of " + playerScore);
-            EndRound();
-        }
-        else if (dealerScore > 21)
-        {
-            Debug.Log("Dealer busts with a score of " + dealerScore);
-            EndRound();
-        }
-        
     }
 
     void DealerTurn() 
@@ -249,7 +225,7 @@ public class GenerateCards : MonoBehaviour
 
         // Dealer draws cards until score is >= 17
         int score = CalculateScore(dealerCards);
-        if (score < 17)
+        while (score < 17)
         {
             // Add a card to dealer's hand
             Card newCard = DealCard();
@@ -257,42 +233,16 @@ public class GenerateCards : MonoBehaviour
 
             // Generate new card object and add to dealer's hand
             GameObject newdealerCardObj = Instantiate(newCard.card, dealerHand);
-            newdealerCardObj.transform.localPosition = new Vector3(dealerCardPos.x + (dealerCards.Count-1) * 0.1f, dealerCardPos.y, dealerCardPos.z);
+            newdealerCardObj.transform.localPosition = new Vector3(dealerCardPos.x + (dealerCards.Count - 1) * 0.1f, dealerCardPos.y, dealerCardPos.z);
             newdealerCardObj.transform.localScale = scaleCard;
 
+            CheckForBust();
+            CheckForBlackjack();
             score = CalculateScore(dealerCards);
         }
 
-        // Calculate dealer's score
-        score = CalculateScore(dealerCards);
-
-        // Check if dealer busts
-        if (score > 21)
-        {
-            Debug.Log("Dealer busts with a score of " + score);
-            EndRound();
-        }
-        else
-        {
-            // Check who won
-            int playerScore = CalculateScore(playerCards);
-            if (playerScore > score)
-            {
-                Debug.Log("Player wins with a score of " + playerScore);
-            }
-            else if (playerScore < score)
-            {
-                Debug.Log("Dealer wins with a score of " + score);
-            }
-            else
-            {
-                Debug.Log("It's a tie with a score of " + playerScore);
-            }
-
-            EndRound();
-        }
-
-        PlayerTurn();
+        CheckForWinner();
+        startBtn.gameObject.SetActive(true);
     }
 
     // Calculate the score of a hand of cards
@@ -318,11 +268,7 @@ public class GenerateCards : MonoBehaviour
             aceCount--;
         }
 
-
         return score;
-
-
-
     }
 
     // Check if player or dealer has blackjack
@@ -331,25 +277,86 @@ public class GenerateCards : MonoBehaviour
         int playerScore = CalculateScore(playerCards);
         int dealerScore = CalculateScore(dealerCards);
 
-    if (playerScore == 21 && dealerScore != 21)
+        if (playerScore == 21 && dealerScore != 21)
         {
+            winLoseText.gameObject.SetActive(true);
+            winLoseText.text = "Player has blackjack!";
             Debug.Log("Player has blackjack!");
             EndRound();
-        }
+            }
         else if (playerScore != 21 && dealerScore == 21)
         {
+            winLoseText.gameObject.SetActive(true);
+            winLoseText.text = "Dealer has blackjack!";
             Debug.Log("Dealer has blackjack!");
             EndRound();
         }
         else if (playerScore == 21 && dealerScore == 21)
         {
+            winLoseText.gameObject.SetActive(true);
+            winLoseText.text = "Both have blackjack!";
             Debug.Log("Both have blackjack!");
+            EndRound();
+        }
+    }
+
+    // Check if player or dealer busts
+    void CheckForBust() 
+    {
+        int playerScore = CalculateScore(playerCards);
+        int dealerScore = CalculateScore(dealerCards);
+        Debug.Log("playerScore: " + playerScore + ", dealerScore: " + dealerScore);
+
+        if (playerScore > 21)
+        {
+            winLoseText.gameObject.SetActive(true);
+            winLoseText.text = "Player busts with a score of " + playerScore;
+            Debug.Log("Player busts with a score of " + playerScore);
+            EndRound();
+        }
+        else if (dealerScore > 21) 
+        {
+            winLoseText.gameObject.SetActive(true);
+            winLoseText.text = "Dealer busts with a score of " + dealerScore;
+            Debug.Log("Dealer busts with a score of " + dealerScore);
+            EndRound();
+        }
+    }
+
+    // Check who Won
+    void CheckForWinner()
+    {
+        int playerScore = CalculateScore(playerCards);
+        int dealerScore = CalculateScore(dealerCards);
+
+        if (playerScore < 21 && dealerScore < 21)
+        {
+            if (playerScore > dealerScore)
+            {
+                winLoseText.gameObject.SetActive(true);
+                winLoseText.text = "Player wins with a score of " + playerScore;
+                Debug.Log("Player wins with a score of " + playerScore);
+            }
+            else if (playerScore < dealerScore)
+            {
+                winLoseText.gameObject.SetActive(true);
+                winLoseText.text = "Dealer wins with a score of " + dealerScore;
+                Debug.Log("Dealer wins with a score of " + dealerScore);
+            }
+            else
+            {
+                winLoseText.gameObject.SetActive(true);
+                winLoseText.text = "It's a tie with a score of " + playerScore;
+                Debug.Log("It's a tie with a score of " + playerScore);
+            }
             EndRound();
         }
     }
 
     void EndRound()
     {
-        
+        GameObject newdealerCardObj = Instantiate(dealerCards[0].card, dealerHand);
+        newdealerCardObj.transform.position = dealerCardPos;
+        newdealerCardObj.transform.localScale = scaleCard;
     }
 }
