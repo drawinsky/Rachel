@@ -12,4 +12,5 @@ public class Piece : MonoBehaviour
     public int col = -1; // piece location
     public bool isSelected = false;
     public bool isCrowned = false;
+
 }
