@@ -13,7 +13,11 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: e41ffe6af83c83241a9e6dc05fd039be, type: 2}
     - target: {fileID: 245502660893667155, guid: b632e8cb8c056f14a8500c61c32cf3d2, type: 3}
       propertyPath: m_Name
-      value: PV_ChessBoardCube Variant
+      value: PV_CheckerBoardCubeD
+      objectReference: {fileID: 0}
+    - target: {fileID: 245502660893667155, guid: b632e8cb8c056f14a8500c61c32cf3d2, type: 3}
+      propertyPath: m_TagString
+      value: Square
       objectReference: {fileID: 0}
     - target: {fileID: 4226152469113463687, guid: b632e8cb8c056f14a8500c61c32cf3d2, type: 3}
       propertyPath: m_RootOrder
