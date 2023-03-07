@@ -32,7 +32,8 @@ public class Checkers : MonoBehaviour
     private void Start()
     {
         squareSize = 8.0f / boardSize;
-        gameInfoTxt.text = "Press NEW GAME button to start checker game.";
+        gameInfoTxt.text = "";
+        newGame.onClick.AddListener(RestartGame);
 
         GenerateBoard();
         InitGame();
