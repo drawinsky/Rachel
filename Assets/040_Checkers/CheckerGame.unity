@@ -928,7 +928,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b9e6ee01d3f8464abc232c21628d586, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  checkerBoard: {fileID: 0}
+  checkerBoard: {fileID: 755895207}
   lightSquarePrefab: {fileID: 245502660893667155, guid: b632e8cb8c056f14a8500c61c32cf3d2, type: 3}
   darkSquarePrefab: {fileID: 7798443412710095460, guid: 73e913090e9649d428042c7e4de72f1d, type: 3}
   checkerPrefabs:
