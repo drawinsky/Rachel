@@ -46,9 +46,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlightMaterial: {fileID: 2100000, guid: 68d464f29612195488c71ba3ac9fbb7b, type: 2}
-  player: 0
-  row: 0
-  col: 0
+  player: -1
+  row: -1
+  col: -1
+  isSelected: 0
+  isCrowned: 0
 --- !u!1 &8630405570282424743
 GameObject:
   m_ObjectHideFlags: 0

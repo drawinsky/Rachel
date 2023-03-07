@@ -48,12 +48,15 @@ public class Checkers : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
             RaycastHit hit;
+            Debug.LogError("Piece");
 
             if (Physics.Raycast(ray, out hit))
             {
                 // If the player clicked on a piece
                 if (hit.collider.CompareTag("Piece"))
                 {
+                    Debug.LogError("withTag Piece");
+
                     GameObject selectedObj = hit.collider.gameObject;
                     int xHit = Mathf.RoundToInt(hit.point.x);
                     int yHit = Mathf.RoundToInt(hit.point.z);
@@ -94,7 +97,7 @@ public class Checkers : MonoBehaviour
                         }
                     }
                 }
-                selectedPiece.isSelected = false;
+                
             }
         }
     }
@@ -140,10 +143,10 @@ public class Checkers : MonoBehaviour
                     GameObject checker = Instantiate(checkerPrefabs[0], checkerPos, Quaternion.identity);
                     checker.transform.SetParent(playerOne.transform);
                     Piece piece = checker.GetComponent<Piece>();
-                    piece.player = 1;
-                    piece.row = row;
-                    piece.col = col;
-                    pieces[row, col] = piece;
+                    //piece.player = 1;
+                    //piece.row = row;
+                    //piece.col = col;
+                    //pieces[row, col] = piece;
                     
 
                     // Find and Hide the crown object as a child of this checker
@@ -162,10 +165,10 @@ public class Checkers : MonoBehaviour
                     GameObject checker = Instantiate(checkerPrefabs[1], checkerPos, Quaternion.identity);
                     checker.transform.SetParent(playerTwo.transform);
                     Piece piece = checker.GetComponent<Piece>();
-                    piece.player = 2;
-                    piece.row = row;
-                    piece.col = col;
-                    pieces[row, col] = piece;
+                    //piece.player = 2;
+                    //piece.row = row;
+                    //piece.col = col;
+                    //pieces[row, col] = piece;
                     
 
                     // Find and Hide the crown object as a child of this checker
