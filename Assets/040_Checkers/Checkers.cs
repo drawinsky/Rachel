@@ -53,8 +53,8 @@ public class Checkers : MonoBehaviour
             if (Physics.Raycast(ray, out hit))
             {
                 // If the player clicked on a piece
-                if (hit.collider.CompareTag("Piece"))
-                {
+                //if (hit.collider.CompareTag("Piece"))
+                //{
                     Debug.LogError("withTag Piece");
 
                     GameObject selectedObj = hit.collider.gameObject;
@@ -62,9 +62,13 @@ public class Checkers : MonoBehaviour
                     int yHit = Mathf.RoundToInt(hit.point.z);
                     selectedPiece = pieces[xHit, yHit];
                     selectedPiece.isSelected = true;
+                    
 
                     // Check if it's the current player's turn
                     if (selectedPiece.player != currentPlayer || IsGameOver()) return;
+                    
+                    FindValidMoves();
+                    Debug.LogError("current player's turn");
 
                     // Check if the player clicked on a valid move
                     if (Mouse.current.leftButton.wasPressedThisFrame)
@@ -72,8 +76,9 @@ public class Checkers : MonoBehaviour
                         if (Physics.Raycast(ray, out hit))
                         {
                             // If the player clicked on a square
-                            if (hit.collider.CompareTag("Square"))
-                            {
+                            //if (hit.collider.CompareTag("Square"))
+                            //{
+                                
                                 GameObject square = hit.collider.gameObject;
                                 for (int row = 0; row < boardSize; row++)
                                 {
@@ -93,10 +98,10 @@ public class Checkers : MonoBehaviour
                                         }
                                     }
                                 }
-                            }
+                            //}
                         }
                     }
-                }
+                //}
                 
             }
         }
