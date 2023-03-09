@@ -484,6 +484,26 @@ public class Checkers : MonoBehaviour
 
     void EndTurn()
     {
+        if (selectedPiece.isCrowned == true)
+        {
+            if (selectedPiece.player == 1 && selectedPiece.row == 0)
+            {
+                isGameOver = true;
+                gameInfoTxt.text = "Game Over! Player " + currentPlayer + " Wins!";
+                newGame.gameObject.SetActive(true);
+                return;
+            }
+            else if (selectedPiece.player == 2 && selectedPiece.row == boardSize - 1)
+            {
+                isGameOver = true;
+                gameInfoTxt.text = "Game Over! Player " + currentPlayer + " Wins!";
+                newGame.gameObject.SetActive(true);
+                return;
+            }
+            // Deselect the current piece
+            DeselectPiece();
+        }
+
         // Deselect the current piece
         DeselectPiece();
 
@@ -497,6 +517,7 @@ public class Checkers : MonoBehaviour
         }
 
         
+
         // Switch to the next player
         currentPlayer = (currentPlayer == 1) ? 2 : 1;
         hasKilled = false;
