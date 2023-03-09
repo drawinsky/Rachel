@@ -568,7 +568,7 @@ public class Checkers : MonoBehaviour
         }
         foreach (Transform child in checkerBoard.transform)
         {
-            Destroy(child);
+            Destroy(child.gameObject);
         }
 
         // Reset the game variables
@@ -584,6 +584,7 @@ public class Checkers : MonoBehaviour
         InitGame();
         // Update the UI
         UpdateUI();
+        gameInfoTxt.text = "";
 
         newGame.gameObject.SetActive(false);
     }
