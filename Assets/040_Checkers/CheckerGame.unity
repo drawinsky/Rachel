@@ -931,9 +931,8 @@ MonoBehaviour:
   checkerBoard: {fileID: 755895207}
   lightSquarePrefab: {fileID: 245502660893667155, guid: b632e8cb8c056f14a8500c61c32cf3d2, type: 3}
   darkSquarePrefab: {fileID: 7798443412710095460, guid: 73e913090e9649d428042c7e4de72f1d, type: 3}
-  checkerPrefabs:
-  - {fileID: 1061739866008223121, guid: c1bfcc759c9838d49931b96d29d914bf, type: 3}
-  - {fileID: 1061739866008223121, guid: 9aad6c7eeb467ab4eaf764cd2b42b2a6, type: 3}
+  checkerPrefabOne: {fileID: -4918629753807974153, guid: 9aad6c7eeb467ab4eaf764cd2b42b2a6, type: 3}
+  checkerPrefabTwo: {fileID: 7918336441641093045, guid: c1bfcc759c9838d49931b96d29d914bf, type: 3}
   playerOne: {fileID: 1612869622}
   playerTwo: {fileID: 174525115}
   currentTurnTxt: {fileID: 92092555}
@@ -942,7 +941,9 @@ MonoBehaviour:
   gameInfoTxt: {fileID: 528146460}
   newGame: {fileID: 341472950}
   boardSize: 8
-  highlightMaterial: {fileID: 0}
+  highlightMaterial: {fileID: 2100000, guid: 68d464f29612195488c71ba3ac9fbb7b, type: 2}
+  darkMaterial: {fileID: 2100000, guid: e41ffe6af83c83241a9e6dc05fd039be, type: 2}
+  lightMeterial: {fileID: 2100000, guid: 81c400730d8060b4cba1f4facf7c810a, type: 2}
   validMoves: []
 --- !u!1 &807404217
 GameObject:

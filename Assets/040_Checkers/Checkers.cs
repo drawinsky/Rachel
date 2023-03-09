@@ -8,7 +8,7 @@ using TMPro;
 public class Checkers : MonoBehaviour
 {
     public GameObject checkerBoard, lightSquarePrefab, darkSquarePrefab; // Checker board elements
-    public GameObject[] checkerPrefabs = new GameObject[2];
+    public Piece checkerPrefabOne, checkerPrefabTwo;
     public GameObject playerOne, playerTwo;
     public TextMeshProUGUI currentTurnTxt, p1PieceCountTxt, p2PieceCountTxt, gameInfoTxt;
     public Button newGame;
@@ -19,19 +19,18 @@ public class Checkers : MonoBehaviour
     private bool isGameOver = false;
     private bool isValidMove = false;
     private Piece[,] pieces;
-    private Piece selectedPiece;
-    public Material highlightMaterial;
 
-    private float squareSize = 1.0f;
+    public Material highlightMaterial, darkMaterial, lightMeterial;
+
+    private int squareSize = 1;
     private GameObject[,] squares; // 2D array that stores references to each square on the checker board
 
     private GameObject crown;
 
     public List<GameObject> validMoves;
-
+    
     private void Start()
     {
-        squareSize = 8.0f / boardSize;
         gameInfoTxt.text = "";
         newGame.onClick.AddListener(RestartGame);
 
@@ -41,76 +40,58 @@ public class Checkers : MonoBehaviour
         newGame.gameObject.SetActive(false);
     }
 
+    private Piece selectedPiece = null;
+    private Piece getPiece = null;
+    private RaycastHit hitPiece;
+
     // Update is called once per frame
     void Update()
     {
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+            bool didHitSomething = Physics.Raycast(ray, out RaycastHit hit);
+            hitPiece = hit;
+            Debug.Log("HitScrene");
+            
 
-            RaycastHit hit;
-            Debug.LogError("Piece");
-
-            if (Physics.Raycast(ray, out hit))
+            if (didHitSomething == true)
             {
-                // If the player clicked on a piece
-                //if (hit.collider.CompareTag("Piece"))
-                //{
-                    Debug.LogError("withTag Piece");
+                Debug.Log("HitSth");
 
-                    GameObject selectedObj = hit.collider.gameObject;
+                // If selected piece, place it
+                if (selectedPiece != null)
+                {
                     int xHit = Mathf.RoundToInt(hit.point.x);
-                    int yHit = Mathf.RoundToInt(hit.point.z);
-                    selectedPiece = pieces[xHit, yHit];
-                    selectedPiece.isSelected = true;
+                    int zHit = Mathf.RoundToInt(hit.point.z);
+                    
+                    Debug.Log("selectedPiece != null");
+                    MovePiece(selectedPiece, xHit, zHit);
+                    //selectedPiece.SetPosition(xHit, zHit);
+                    selectedPiece = null;
+                }
+                // If not, select a piece
+                else
+                {
+                    getPiece = hit.collider.gameObject.GetComponent<Piece>();
+                    SelectPiece(getPiece);
                     
 
-                    // Check if it's the current player's turn
-                    if (selectedPiece.player != currentPlayer || IsGameOver()) return;
-                    
-                    FindValidMoves();
-                    Debug.LogError("current player's turn");
+                }
 
-                    // Check if the player clicked on a valid move
-                    if (Mouse.current.leftButton.wasPressedThisFrame)
-                    {                        
-                        if (Physics.Raycast(ray, out hit))
-                        {
-                            // If the player clicked on a square
-                            //if (hit.collider.CompareTag("Square"))
-                            //{
-                                
-                                GameObject square = hit.collider.gameObject;
-                                for (int row = 0; row < boardSize; row++)
-                                {
-                                    for (int col = 0; col < boardSize; col++)
-                                    {
-                                        if (squares[row,col] = square)
-                                        {
-                                            int xPos = row;
-                                            int yPos = col;
-
-                                            // If the square is a valid move for the selected piece
-                                            if (IsValidMove(xPos, yPos))
-                                            {
-                                                // Move the piece to the selected square
-                                                MovePiece(selectedPiece, xPos, yPos);
-                                            }
-                                        }
-                                    }
-                                }
-                            //}
-                        }
-                    }
-                //}
-                
+                Debug.DrawRay(hit.point, Vector3.up, Color.cyan, 2);
             }
+
+            Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow, 2);
+
         }
+
     }
 
     void GenerateBoard()
     {
         squares = new GameObject[boardSize, boardSize];
+        pieces = new Piece[boardSize, boardSize];
 
         // Instatiate the light and dark square prefabs as child objects of the board
         for (int row = 0; row < boardSize; row++)
@@ -118,8 +99,6 @@ public class Checkers : MonoBehaviour
             for (int col = 0; col < boardSize; col++)
             {
                 // Calculate the position of the square
-                float xPos = row * squareSize;
-                float zPos = col * squareSize;
 
                 // Determine whether this square should be light or dark
                 GameObject squarePrefab;
@@ -134,25 +113,23 @@ public class Checkers : MonoBehaviour
                 //GameObject squarePrefab = ((row + col) % 2 == 0) ? lightSquarePrefab : darkSquarePrefab;
 
                 // Instantiate aquare prefab and set its position
-                Vector3 squarePos = new Vector3(xPos, 0, zPos);
+                Vector3 squarePos = new Vector3(row, 0, col);
                 GameObject square = Instantiate(squarePrefab, squarePos, Quaternion.identity);
-                square.transform.SetParent(transform);
+                square.transform.SetParent(checkerBoard.transform);
 
 
                 // Store the square reference in a 2D array
                 squares[row, col] = square;
 
                 // Instatiate players' checkers on the dark squares
-                Vector3 checkerPos = new Vector3(xPos, 0.2f, zPos);
                 if (row < 3 && (row + col) % 2 != 0)
                 {
-                    GameObject checker = Instantiate(checkerPrefabs[0], checkerPos, Quaternion.identity);
+                    // player 1's checker
+                    Piece checker = Instantiate(checkerPrefabOne);
                     checker.transform.SetParent(playerOne.transform);
-                    Piece piece = checker.GetComponent<Piece>();
-                    //piece.player = 1;
-                    //piece.row = row;
-                    //piece.col = col;
-                    //pieces[row, col] = piece;
+                    checker.SetPosition(row, col);
+                    checker.player = 1;
+                    pieces[row, col] = checker;
                     
 
                     // Find and Hide the crown object as a child of this checker
@@ -168,14 +145,12 @@ public class Checkers : MonoBehaviour
                 }
                 else if (row > 4 && (row + col) % 2 != 0)
                 {
-                    GameObject checker = Instantiate(checkerPrefabs[1], checkerPos, Quaternion.identity);
+                    // player 2's checker
+                    Piece checker = Instantiate(checkerPrefabTwo);
                     checker.transform.SetParent(playerTwo.transform);
-                    Piece piece = checker.GetComponent<Piece>();
-                    //piece.player = 2;
-                    //piece.row = row;
-                    //piece.col = col;
-                    //pieces[row, col] = piece;
-                    
+                    checker.SetPosition(row, col);
+                    checker.player = 2;
+                    pieces[row, col] = checker;
 
                     // Find and Hide the crown object as a child of this checker
                     crown = checker.transform.Find("Crown").gameObject;
@@ -247,22 +222,23 @@ public class Checkers : MonoBehaviour
         // Check if the piece belongs to the current player
         if (piece.player != currentPlayer)
         {
+            Debug.Log("getPiece.player = " + getPiece.player);
+            Debug.Log("currentPlayer = " + currentPlayer);
             return;
         }
-
-        // Deselect the previously selected piece
         if (selectedPiece != null)
         {
+            Debug.Log($"selected piece at {selectedPiece.row}, {selectedPiece.col}");
             selectedPiece.isSelected = false;
         }
 
         // Select the new piece
         selectedPiece = piece;
         selectedPiece.isSelected = true;
-
+        Debug.Log(selectedPiece);
         // Find and show valid moves for this piece
         FindValidMoves();
-    }
+        }
 
     void FindValidMoves()
     {
@@ -283,6 +259,7 @@ public class Checkers : MonoBehaviour
             CheckDirection(selectedPiece.row + direction, selectedPiece.col - 1);
         }
 
+        
         // Check for capture moves
         if (hasKilled)
         {
@@ -309,16 +286,21 @@ public class Checkers : MonoBehaviour
         }
 
         // Show valid moves
-        foreach (GameObject move in validMoves)
-        {
-            move.SetActive(true);
-        }
+        //foreach (GameObject move in validMoves)
+        //{
+        //    move.SetActive(true);
+        //}
+
+        
     }
 
     void CheckDirection(int row, int col)
     {
-        int targetRow = row + (row - selectedPiece.row);
-        int targetCol = col + (col - selectedPiece.col);
+        //int targetRow = row + (row - selectedPiece.row);
+        //int targetCol = col + (col - selectedPiece.col);
+        int targetRow = row ;
+        int targetCol = col ;
+        Debug.Log($"target square at {targetRow}, {targetCol}");
         if (targetRow < 0 || targetRow >= boardSize || targetCol < 0 || targetCol >= boardSize)
         {
             return;
@@ -329,30 +311,44 @@ public class Checkers : MonoBehaviour
         // If the target square is unoccupied, add it to the valid moves list
         if (targetPiece == null)
         {
+            Debug.Log("a valid move");
             validMoves.Add(squares[targetRow, targetCol]);
+
+            HighlightSquare(squares[targetRow, targetCol]);
             return;
         }
 
         // If the target square is occupied by an opponent's piece, check if we can capture it
         if (targetPiece.player != currentPlayer)
         {
-            int captureRow = targetRow + (targetRow - row);
-            int captureCol = targetCol + (targetCol - col);
+            int captureRow = row + (row - selectedPiece.row);
+            int captureCol = col + (col - selectedPiece.col);
+            //int captureRow = targetRow + (targetRow - row);
+            //int captureCol = targetCol + (targetCol - col);
+            Debug.Log($"target square at {targetRow}, {targetCol}");
+            Debug.Log($"selected piece at {selectedPiece.row}, {selectedPiece.col}");
+            Debug.Log($"capture square at {captureRow}, {captureCol}");
 
             // Check if the capture move is within the bounds of the board
             if (captureRow < 0 || captureRow >= boardSize || captureCol < 0 || captureCol >= boardSize)
             {
                 return;
             }
-
+            
             // Check if the square beyond the opponent's piece is unoccupied
             Piece capturePiece = pieces[captureRow, captureCol];
             if (capturePiece == null)
             {
+                Debug.Log("a valid capture move");
                 // This is a valid capture move, so add the target square to the valid moves list
-                validMoves.Add(squares[targetRow, targetCol]);
+                validMoves.Add(squares[captureRow, captureCol]);
+                HighlightSquare(squares[captureRow, captureCol]);
+                return;
             }
         }
+
+        
+
     }
 
     public List<Vector2Int> GetValidMoves(Piece piece)
@@ -424,40 +420,55 @@ public class Checkers : MonoBehaviour
     }
 
 
-    public void MovePiece(Piece piece, int row, int col)
+    public void MovePiece(Piece piece, int hitRow, int hitCol)
     {
         if (selectedPiece != null)
         {
-            if (IsValidMove(row, col))
-            {
-                // Move the selected piece to the new square
-                Vector3 checkerPos = new Vector3(row * squareSize, 0.2f, col * squareSize);
-                piece.transform.position = checkerPos;
-                pieces[piece.row, piece.col] = null;
-                piece.row = row;
-                piece.col = col;
-                pieces[row, col] = piece;
+            int preSelectRow = selectedPiece.row;
+            int preSelectCol = selectedPiece.col;
+            //if (IsValidMove(hitRow, hitCol))
+            //{
+            // Move the selected piece to the new square
+            //piece.SetPosition(hitRow, hitCol);
+            //pieces[piece.row, piece.col] = null;
+            //pieces[hitRow, hitCol] = piece;
 
-                CheckForCrown(piece);
+            //CheckForCrown(piece);
+            //}
+            for (int i = 0; i < validMoves.Count; i++)
+            {
+                if (validMoves[i] == squares[hitRow, hitCol])
+                {
+                    // Move the selected piece to the new square
+                    pieces[piece.row, piece.col] = null;
+                    pieces[hitRow, hitCol] = piece;
+                    piece.SetPosition(hitRow, hitCol);
+                    CheckForCrown(piece);
+                }
             }
+            
 
-            // Check if the piece has captured an enemy piece
-            if (Mathf.Abs(row - piece.row) == 2)
+            //Check if the piece has captured an enemy piece
+            Debug.Log(Mathf.Abs(hitRow - preSelectRow));
+            if (Mathf.Abs(hitRow - preSelectRow) == 2)
             {
+                Debug.Log("captured an enemy piece");
                 hasKilled = true;
-                int killRow = (piece.row + row) / 2;
-                int killCol = (piece.col + col) / 2;
+                int killRow = (preSelectRow + hitRow) / 2;
+                int killCol = (preSelectCol + hitCol) / 2;
                 Piece killedPiece = pieces[killRow, killCol];
                 pieceCount[killedPiece.player - 1]--;
                 Destroy(killedPiece.gameObject);
-                pieces[killRow, killCol] = null;
+
                 // Check if there are any more valid moves for this piece
                 if (GetValidMoves(selectedPiece).Count > 0 && piece.isCrowned == false)
                 {
-                    SelectPiece(selectedPiece);
+                    SelectPiece(getPiece);
                     return;
                 }
             }
+
+            
 
             // End the turn if the piece didn't capture an enemy piece or there are no more valid moves
             if (hasKilled == false || GetValidMoves(selectedPiece).Count == 0 || piece.isCrowned == true)
@@ -466,7 +477,7 @@ public class Checkers : MonoBehaviour
             }
             else
             {
-                SelectPiece(selectedPiece);
+                SelectPiece(getPiece);
             }
         }
     }
@@ -485,6 +496,7 @@ public class Checkers : MonoBehaviour
             return;
         }
 
+        
         // Switch to the next player
         currentPlayer = (currentPlayer == 1) ? 2 : 1;
         hasKilled = false;
@@ -498,6 +510,13 @@ public class Checkers : MonoBehaviour
         if ((piece.player == 1 && piece.row == boardSize - 1) || (piece.player == 2 && piece.row == 0))
         {
             piece.isCrowned = true;
+            // Find and Show the crown object as a child of this checker
+            Transform crownTransform = piece.transform.Find("Crown");
+            if (crownTransform != null)
+            {
+                crown = crownTransform.gameObject;
+                crown.SetActive(true);
+            }
         }
     }
 
@@ -526,7 +545,7 @@ public class Checkers : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-        foreach (Transform child in this.transform)
+        foreach (Transform child in checkerBoard.transform)
         {
             Destroy(child);
         }
@@ -541,9 +560,11 @@ public class Checkers : MonoBehaviour
 
         // Regenerate the board
         GenerateBoard();
-
+        InitGame();
         // Update the UI
         UpdateUI();
+
+        newGame.gameObject.SetActive(false);
     }
 
     public void DeselectPiece()
@@ -555,20 +576,43 @@ public class Checkers : MonoBehaviour
         UnhighlightAllSquares();
     }
 
-    public void HighlightSquare(int row, int col)
+    public void HighlightSquare(GameObject square)
     {
-        GameObject square = squares[row, col];
-        Renderer squareRenderer = square.GetComponent<Renderer>();
-        squareRenderer.material = highlightMaterial;
-        validMoves.Add(square);
+        //GameObject square = squares[row, col];
+        //Renderer squareRenderer = square.GetComponent<Renderer>();
+        //squareRenderer.material = highlightMaterial;
+        //validMoves.Add(square);
+
+        // Get the child object by name
+        Transform childObject = square.transform.Find("Cube");
+
+        // Set the material of the child object
+        Renderer childRenderer = childObject.GetComponent<Renderer>();
+        childRenderer.material = highlightMaterial;
     }
 
     public void UnhighlightAllSquares()
     {
         foreach (GameObject square in validMoves)
         {
-            Renderer squareRenderer = square.GetComponent<Renderer>();
-            squareRenderer.material = (square.GetComponent<Square>().isDark) ? darkSquarePrefab.GetComponent<Renderer>().material : lightSquarePrefab.GetComponent<Renderer>().material;
+            
+            // Get the child object by name
+            Transform childObject = square.transform.Find("Cube");
+
+            // Set the material of the child object
+            Renderer childRenderer = childObject.GetComponent<Renderer>();
+            childRenderer.material = darkMaterial;
+
+            //if (square == darkSquarePrefab)
+            //{
+                //childRenderer.material = darkMaterial;
+            //}
+            //else if (square == lightSquarePrefab)
+            //{
+                //childRenderer.material = lightMeterial;
+            //}
+            //Renderer squareRenderer = square.GetComponent<Renderer>();
+            //squareRenderer.material = (square.GetComponent<Square>().isDark) ? darkSquarePrefab.GetComponent<Renderer>().material : lightSquarePrefab.GetComponent<Renderer>().material;
         }
         validMoves.Clear();
     }

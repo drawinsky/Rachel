@@ -13,4 +13,11 @@ public class Piece : MonoBehaviour
     public bool isSelected = false;
     public bool isCrowned = false;
 
+    public void SetPosition(int newX, int newY)
+    {
+        row = newX;
+        col = newY;
+
+        transform.position = new Vector3(row, 0.2f, col);
+    }
 }
