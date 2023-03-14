@@ -14,9 +14,10 @@ public class Pin : MonoBehaviour
         {
             if (collision.collider.CompareTag("Ball") || collision.collider.CompareTag("Pin"))
             {
-                //var point = GameObject.FindGameObjectWithTag("Ball").GetComponent<BowlingBallController>.score;
+                //var point = GameObject.FindGameObjectWithTag("Ball").GetComponent<BowlingBallController>()._score;
                 //point += 1;
                 _done = true;
+                
             }
         }
     }
