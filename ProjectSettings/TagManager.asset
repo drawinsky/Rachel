@@ -9,6 +9,8 @@ TagManager:
   - Terrain
   - Square
   - Piece
+  - Pin
+  - Ball
   layers:
   - Default
   - TransparentFX
