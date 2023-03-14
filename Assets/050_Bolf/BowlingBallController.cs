@@ -12,14 +12,15 @@ public class BowlingBallController : MonoBehaviour
     public float gutterHeight = -10f; // The y-position below which the ball is considered to have fallen off the ledge
     public TextMeshProUGUI scoreText; // The UI Text object used to display the score
     public TextMeshProUGUI resultText; // The UI Text object used to display the result (e.g. "STRIKE", "GUTTER", etc.)
-    public Button reStartBtn;
-    public Button nextLevelBtn;
+    public Button rePlayBtn;
+    public Button MenuBtn;
     public GameObject pinHolder;
 
     private bool isLaunched = false; // Indicates whether the ball has been launched
     private Rigidbody ballRigidbody; // The Rigidbody component of the ball
     private int _score = 0; // The player's score
     private int _pinsKnockedDown = 0; // The number of pins knocked down by the ball or other pins
+    public bool _secondRound = false;
 
 
     // Start is called before the first frame update
@@ -50,9 +51,13 @@ public class BowlingBallController : MonoBehaviour
         }
         else
         {
-            CheckGutter();
-            CountFallenPins();
             CountScore();
+            
+            if (_secondRound)
+            {
+
+            }
+            
         }
     }
 
@@ -72,29 +77,27 @@ public class BowlingBallController : MonoBehaviour
 
     void CountScore()
     {
+        CountFallenPins();
+
         if (_pinsKnockedDown == pinHolder.transform.childCount)
         {
             // all pins have fallen down, it's a strike
             _score += 10;
-            scoreText.text = "STRIKE!";
+            resultText.text = "STRIKE!";
         }
-        else
+        else if (_pinsKnockedDown != 0 && _pinsKnockedDown != pinHolder.transform.childCount)
         {
             // count the number of pins knocked down
             int knockedCount = _pinsKnockedDown - _score;
             _score += knockedCount;
             scoreText.text = knockedCount + " pins knocked down!";
         }
-    }
-
-    void CheckGutter() 
-    {
-        if (transform.position.y < gutterHeight)
+        else if (_pinsKnockedDown == 0 && transform.position.y < gutterHeight)
         {
             // If the ball has fallen off the ledge, reset the score and update the UI
             _score = 0;
             _pinsKnockedDown = 0;
-            UpdateScoreUI();
+            _secondRound = true;
 
             // Display the result text
             resultText.text = "GUTTER";
