@@ -17,7 +17,6 @@ public class Checkers : MonoBehaviour
     private int[] pieceCount = new int[2];
     private bool hasKilled = false;
     private bool isGameOver = false;
-    private bool isValidMove = false;
     private Piece[,] pieces;
 
     public Material highlightMaterial, darkMaterial, lightMeterial;
